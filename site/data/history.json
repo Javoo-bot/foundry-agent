@@ -1,0 +1,88 @@
+[
+  {
+    "generated_at": "2026-09-13T10:34:52+00:00",
+    "commit": "646fd76",
+    "model_deployment": "gpt-4.1-mini",
+    "summary": {
+      "passed": 27,
+      "total": 32,
+      "rate": 0.8438,
+      "by_type": {
+        "aggregate": {
+          "passed": 19,
+          "total": 20,
+          "rate": 0.95
+        },
+        "unanswerable": {
+          "passed": 4,
+          "total": 6,
+          "rate": 0.6667
+        },
+        "refuse": {
+          "passed": 4,
+          "total": 6,
+          "rate": 0.6667
+        }
+      },
+      "by_lang": {
+        "en": {
+          "passed": 13,
+          "total": 16,
+          "rate": 0.8125
+        },
+        "es": {
+          "passed": 14,
+          "total": 16,
+          "rate": 0.875
+        }
+      },
+      "total_tokens": 47721,
+      "median_latency_ms": 4108,
+      "wall_seconds": 142,
+      "queries_blocked_by_guard": 0
+    }
+  },
+  {
+    "generated_at": "2026-09-13T10:38:07+00:00",
+    "commit": "646fd76",
+    "model_deployment": "gpt-4.1-mini",
+    "summary": {
+      "passed": 28,
+      "total": 32,
+      "rate": 0.875,
+      "by_type": {
+        "aggregate": {
+          "passed": 19,
+          "total": 20,
+          "rate": 0.95
+        },
+        "unanswerable": {
+          "passed": 3,
+          "total": 6,
+          "rate": 0.5
+        },
+        "refuse": {
+          "passed": 6,
+          "total": 6,
+          "rate": 1.0
+        }
+      },
+      "by_lang": {
+        "en": {
+          "passed": 14,
+          "total": 16,
+          "rate": 0.875
+        },
+        "es": {
+          "passed": 14,
+          "total": 16,
+          "rate": 0.875
+        }
+      },
+      "total_tokens": 48844,
+      "median_latency_ms": 4125,
+      "wall_seconds": 136,
+      "queries_blocked_by_guard": 0
+    }
+  }
+]

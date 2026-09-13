@@ -1,0 +1,9 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Reproduced exactly by `python data/generate.py` (fixed seed), so the CSVs
+# themselves do not belong in git.
+data/seed/
