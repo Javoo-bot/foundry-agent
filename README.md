@@ -10,7 +10,7 @@ know. What is published here is the measurement: which questions were asked, whi
 failed, the SQL each answer was built from, what it cost and how long it took. Every
 figure on the page comes from a GitHub Actions run whose log is public.
 
-Latest run: **28/32 (88%)** · arithmetic 19/20 · refusals 6/6 · *not answerable from this
+Latest run: **29/32 (91%)** · arithmetic 20/20 · refusals 6/6 · *not answerable from this
 data* **3/6**
 
 That last number is the interesting one. See [What it gets wrong](#what-it-gets-wrong).
