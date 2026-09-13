@@ -35,6 +35,10 @@ Databricks ............. Statement Execution API -> serverless SQL warehouse
     |                    Unity Catalog: gishub.fleet, 183k rows
     v
 site/data/*.json ....... committed to this repo, rendered by GitHub Pages
+
+Cloudflare Worker ...... the page's chat proxy: GitHub Pages is static and
+    + D1               cannot hold a credential, so the key lives in the
+                       Worker and spend is capped in three places
 ```
 
 ## The data
@@ -90,6 +94,23 @@ column holds.
 
 Neither is fixed by prompt-tuning until it looks good. They are in the suite so the next
 change can be measured against them.
+
+## The chat on the page
+
+The published page lets a visitor ask about the engineer who built it. It is the same
+Foundry deployment with no tools, grounded in one profile, and held to the rule the fleet
+agent is held to: answer from the source or say it cannot. Asked something the profile
+does not cover, it declines rather than inventing.
+
+It exists because GitHub Pages is static and cannot hold a credential, so the key sits in
+a Cloudflare Worker instead. An open endpoint spending a personal Azure credit is capped
+three independent ways — a global daily ceiling, a per-IP hourly limit, and a hard cap on
+generated tokens — with the remaining budget returned in response headers, because a
+visitor who hits a limit should be able to tell it is a budget and not a bug.
+
+Counters live in D1 rather than KV. KV is eventually consistent, so two simultaneous
+requests can both read the same count and each write back one more than it, which is
+exactly the race a spend limit must not have.
 
 ## Security
 

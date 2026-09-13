@@ -4,23 +4,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fleet Agent — evaluation</title>
+<meta name="description" content="An AI agent on Microsoft Foundry and Databricks, and the evaluation suite that measures it. Built by Javier Lobato.">
 <style>
   :root {
     --bg: #fbfbfa; --panel: #fff; --ink: #1a1a19; --muted: #6b6b66;
     --line: #e4e4df; --accent: #1f6f5c; --pass: #1f6f5c; --fail: #b5432f;
-    --warn: #8a6d1f; --code: #f4f4f1;
+    --warn: #8a6d1f; --code: #f4f4f1; --azure: #2b6cb0; --bricks: #c0442e;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --bg: #14140f; --panel: #1c1c18; --ink: #eceae2; --muted: #9a978c;
       --line: #2e2e28; --accent: #6bc0a5; --pass: #6bc0a5; --fail: #e08a74;
-      --warn: #d6b95c; --code: #22221d;
+      --warn: #d6b95c; --code: #22221d; --azure: #7bb0e8; --bricks: #e88a74;
     }
   }
   :root[data-theme="dark"] {
     --bg: #14140f; --panel: #1c1c18; --ink: #eceae2; --muted: #9a978c;
     --line: #2e2e28; --accent: #6bc0a5; --pass: #6bc0a5; --fail: #e08a74;
-    --warn: #d6b95c; --code: #22221d;
+    --warn: #d6b95c; --code: #22221d; --azure: #7bb0e8; --bricks: #e88a74;
   }
   * { box-sizing: border-box; }
   body {
@@ -28,24 +29,35 @@
     font: 15px/1.6 ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 1000px; margin: 0 auto; padding-block: 40px; padding-left: 20px; padding-right: 20px; }
-  h1 { font-size: 26px; letter-spacing: -.02em; margin: 0 0 6px; }
-  h2 { font-size: 15px; text-transform: uppercase; letter-spacing: .09em;
-       color: var(--muted); margin: 44px 0 14px; font-weight: 600; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding-block: 36px; padding-left: 20px; padding-right: 20px; }
+  h1 { font-size: 27px; letter-spacing: -.02em; margin: 0 0 8px; }
+  h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .1em;
+       color: var(--muted); margin: 42px 0 14px; font-weight: 600; }
   p { margin: 0 0 12px; max-width: 68ch; }
-  .lede { color: var(--muted); max-width: 70ch; }
+  .lede { color: var(--muted); max-width: 72ch; }
+  .sm { font-size: 14px; }
   a { color: var(--accent); }
   code, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 13px; }
 
-  .meta { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 18px 0 0;
-          font-size: 13px; color: var(--muted); }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 16px 0 0; font-size: 13px; color: var(--muted); }
   .meta b { color: var(--ink); font-weight: 600; }
 
-  .tiles { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+  .tiles { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); }
   .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
-  .tile .n { font-size: 27px; font-weight: 650; letter-spacing: -.02em; line-height: 1.1; }
+  .tile .n { font-size: 28px; font-weight: 650; letter-spacing: -.02em; line-height: 1.1; }
   .tile .l { font-size: 12px; color: var(--muted); margin-top: 5px; }
   .tile.big .n { color: var(--accent); }
+  .tile.warnv .n { color: var(--warn); }
+
+  .bars { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px; }
+  .bar { display: grid; grid-template-columns: 190px 1fr 52px; gap: 12px; align-items: center; margin-bottom: 11px; }
+  .bar:last-child { margin-bottom: 0; }
+  .bar .lbl { font-size: 13px; color: var(--muted); }
+  .bar .track { background: var(--code); border-radius: 4px; height: 15px; overflow: hidden; }
+  .bar .fill { height: 100%; background: var(--pass); border-radius: 4px; }
+  .bar .fill.low { background: var(--warn); }
+  .bar .num { font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+  @media (max-width: 560px) { .bar { grid-template-columns: 120px 1fr 46px; gap: 8px; } .bar .lbl { font-size: 12px; } }
 
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
   th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
@@ -60,18 +72,34 @@
   .detail td { background: var(--panel); }
   .detail pre { background: var(--code); padding: 12px; border-radius: 7px; overflow-x: auto;
                 margin: 8px 0; font-size: 12.5px; line-height: 1.5; }
-  .k { color: var(--muted); font-size: 12px; text-transform: uppercase;
-       letter-spacing: .06em; margin: 12px 0 3px; }
+  .k { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; margin: 12px 0 3px; }
   .scroll { overflow-x: auto; }
   .blocked { color: var(--warn); }
   .note { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--warn);
           border-radius: 7px; padding: 14px 16px; margin: 14px 0; }
   .note p:last-child { margin-bottom: 0; }
-  footer { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--line);
-           color: var(--muted); font-size: 13px; }
+
+  .chat { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 12px; }
+  .chip { font-size: 12.5px; padding: 5px 11px; border-radius: 14px; border: 1px solid var(--line);
+          background: var(--bg); color: var(--ink); cursor: pointer; font-family: inherit; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .row { display: flex; gap: 8px; }
+  .row input { flex: 1; min-width: 0; padding: 10px 12px; border-radius: 7px; border: 1px solid var(--line);
+               background: var(--bg); color: var(--ink); font: inherit; font-size: 14px; }
+  .row input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .row button { padding: 10px 18px; border-radius: 7px; border: 0; background: var(--accent);
+                color: var(--bg); font: inherit; font-weight: 600; cursor: pointer; }
+  .row button:disabled { opacity: .5; cursor: default; }
+  #answer { margin-top: 14px; font-size: 14.5px; white-space: pre-wrap; }
+  #answer:empty { display: none; }
+  #budget { font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+  footer { margin-top: 54px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
   ul { max-width: 68ch; padding-left: 20px; }
-  li { margin-bottom: 7px; }
+  li { margin-bottom: 8px; }
   .err { color: var(--fail); }
+  svg text { font-family: ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif; }
 </style>
 </head>
 <body>
@@ -80,84 +108,136 @@
   <h1>Fleet Agent</h1>
   <p class="lede">
     An AI agent that answers questions about a synthetic B2B vehicle fleet by writing SQL
-    against Databricks Unity Catalog, running on Microsoft Foundry. This page is not a demo
-    of the agent — it is the published output of its evaluation suite, which runs in GitHub
-    Actions and fails the build when the score drops. Every figure below comes from a run
-    whose log is public.
+    against Databricks Unity Catalog, running on Microsoft Foundry.
+    <b style="color:var(--ink)">This page is not a demo — it is the agent's evaluation.</b>
+    A demo can be staged and you have no way to check it. Every figure below comes from a
+    GitHub Actions run whose log is public.
   </p>
 
   <div class="meta" id="meta"></div>
 
   <h2>Score</h2>
   <div class="tiles" id="tiles"></div>
+  <div style="height:12px"></div>
+  <div class="bars" id="bars"></div>
+
+  <h2>The stack</h2>
+  <div class="scroll">
+    <svg id="arch" viewBox="0 0 940 300" style="width:100%;max-width:100%;height:auto"
+         role="img" aria-label="GitHub Actions drives a Microsoft Foundry agent, which queries Databricks through a read-only SQL guard; results are published to GitHub Pages.">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+        </marker>
+      </defs>
+
+      <!-- CI -->
+      <rect x="10" y="112" width="152" height="66" rx="8" fill="var(--panel)" stroke="var(--line)"/>
+      <text x="86" y="138" text-anchor="middle" font-size="14" font-weight="600" fill="var(--ink)">GitHub Actions</text>
+      <text x="86" y="157" text-anchor="middle" font-size="11.5" fill="var(--muted)">nightly + on push</text>
+      <line x1="162" y1="145" x2="212" y2="145" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ar)"/>
+
+      <!-- Foundry -->
+      <rect x="214" y="96" width="176" height="98" rx="8" fill="var(--panel)" stroke="var(--azure)" stroke-width="1.6"/>
+      <text x="302" y="122" text-anchor="middle" font-size="14" font-weight="600" fill="var(--azure)">Microsoft Foundry</text>
+      <text x="302" y="141" text-anchor="middle" font-size="11.5" fill="var(--muted)">gpt-4.1-mini · Responses API</text>
+      <text x="302" y="159" text-anchor="middle" font-size="11.5" fill="var(--muted)">tool: query_fleet_data</text>
+      <text x="302" y="177" text-anchor="middle" font-size="11.5" fill="var(--muted)">plans → writes SQL → answers</text>
+      <line x1="390" y1="145" x2="440" y2="145" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ar)"/>
+
+      <!-- Guard -->
+      <rect x="442" y="112" width="140" height="66" rx="8" fill="var(--panel)" stroke="var(--warn)" stroke-width="1.6"/>
+      <text x="512" y="138" text-anchor="middle" font-size="13.5" font-weight="600" fill="var(--warn)">SQL guard</text>
+      <text x="512" y="157" text-anchor="middle" font-size="11.5" fill="var(--muted)">read-only, 18 tests</text>
+      <line x1="582" y1="145" x2="632" y2="145" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ar)"/>
+
+      <!-- Databricks -->
+      <rect x="634" y="96" width="176" height="98" rx="8" fill="var(--panel)" stroke="var(--bricks)" stroke-width="1.6"/>
+      <text x="722" y="122" text-anchor="middle" font-size="14" font-weight="600" fill="var(--bricks)">Databricks</text>
+      <text x="722" y="141" text-anchor="middle" font-size="11.5" fill="var(--muted)">serverless SQL warehouse</text>
+      <text x="722" y="159" text-anchor="middle" font-size="11.5" fill="var(--muted)">Unity Catalog · gishub.fleet</text>
+      <text x="722" y="177" text-anchor="middle" font-size="11.5" fill="var(--muted)">183,000 rows · 5 tables</text>
+
+      <!-- evaluation loop back down to pages -->
+      <path d="M86,178 L86,246 L470,246" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <path d="M810,145 L862,145 L862,246 L556,246" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#ar)"/>
+      <rect x="472" y="224" width="84" height="44" rx="8" fill="var(--panel)" stroke="var(--line)"/>
+      <text x="514" y="243" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink)">16 golden</text>
+      <text x="514" y="258" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink)">cases ×2</text>
+
+      <!-- pages -->
+      <rect x="352" y="20" width="236" height="54" rx="8" fill="var(--panel)" stroke="var(--line)"/>
+      <text x="470" y="42" text-anchor="middle" font-size="13.5" font-weight="600" fill="var(--ink)">GitHub Pages — this page</text>
+      <text x="470" y="60" text-anchor="middle" font-size="11.5" fill="var(--muted)">results committed to the repo</text>
+      <path d="M86,112 L86,47 L350,47" fill="none" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ar)"/>
+    </svg>
+  </div>
+  <p class="lede sm" style="margin-top:10px">
+    Read-only is enforced in the tool, not in the prompt. Instructions that say “only run
+    SELECT” are a request to a model; a parser that refuses everything else is a control,
+    and CI runs its 18 tests before the evaluation is allowed to start.
+  </p>
+
+  <h2>Ask about the engineer who built this</h2>
+  <div class="chat">
+    <p class="lede sm" style="margin-bottom:12px">
+      Same Foundry deployment, no tools, grounded in one profile — and held to the same rule
+      as the fleet agent: answer from the source or say it cannot. Try to make it invent
+      something.
+    </p>
+    <div class="chips" id="chips"></div>
+    <div class="row">
+      <input id="q" type="text" maxlength="400" placeholder="What has he actually shipped to production?"
+             aria-label="Ask a question">
+      <button id="send">Ask</button>
+    </div>
+    <div id="answer" aria-live="polite"></div>
+    <div id="budget">Runs on a personal Azure credit: 8 questions per visitor per hour.</div>
+  </div>
 
   <h2>Trend</h2>
   <div id="trend"></div>
 
   <h2>Every case</h2>
-  <p class="lede" style="font-size:14px">
-    Sixteen golden cases in two languages. Ten want a specific number; three cannot be
-    answered from this schema and saying so is the pass; three must be declined. Click any
-    row for the agent's answer and the SQL it actually ran.
+  <p class="lede sm">
+    Sixteen golden cases, each asked in English and Spanish. Ten want a specific number;
+    three cannot be answered from this schema and saying so is the pass; three must be
+    declined. Click a row for the answer and the SQL behind it.
   </p>
   <div class="scroll"><table id="cases"><tbody></tbody></table></div>
 
-  <h2>How it is wired</h2>
-  <pre class="mono" style="background:var(--code);padding:14px;border-radius:8px;overflow-x:auto">GitHub Actions (nightly + on push)
-      |
-      |-- API key, as a repository secret
-      v
-  Microsoft Foundry ...... project Responses endpoint, gpt-4.1-mini
-      |                    tool: query_fleet_data(sql, purpose)
-      |
-      v
-  read-only SQL guard .... rejects anything that is not a single SELECT
-      |
-      v
-  Databricks ............. Statement Execution API -> serverless SQL warehouse
-      |                    Unity Catalog: gishub.fleet, 183k rows
-      v
-  results JSON ........... committed to the repo, rendered by this page</pre>
-
   <h2>What building it turned up</h2>
-  <p class="lede" style="font-size:14px">
-    Five decisions and three defects that only appear once something real is running.
-    Each one is a commit in the repository.
-  </p>
   <ul>
     <li><b>The Agents service could not be used, and the reason mattered.</b>
-      <code>AIProjectClient</code> types its credential as <code>TokenCredential</code>
-      and Foundry documents Entra as the only supported method, so the portal API key is
+      <code>AIProjectClient</code> types its credential as <code>TokenCredential</code> and
+      Foundry documents Entra as the only supported method, so the portal API key is
       rejected. The same project's OpenAI-compatible Responses endpoint accepts that key,
       tools and all — which is what makes CI possible with one secret instead of an app
-      registration. The trade is that conversation state and the tool loop are maintained
-      here rather than by the service.</li>
+      registration. The trade is that the tool loop is maintained here rather than by the
+      service.</li>
 
-    <li><b>The first live run failed both cases, for two different reasons.</b> One was
-      the suite's fault: “warranty cost per vehicle” has two honest readings and the
-      question did not say which, so the agent picked the other one and was marked wrong.
-      An ambiguous golden measures the question, not the agent. The other was real — the
-      agent filtered on <code>'high-voltage battery'</code> where the column holds
-      <code>'battery_hv'</code>, and a guess that returns zero rows reads exactly like a
+    <li><b>The first live run failed both cases, for two different reasons.</b> One was the
+      suite's fault: “warranty cost per vehicle” has two honest readings and the question
+      did not say which. An ambiguous golden measures the question, not the agent. The other
+      was real — the agent filtered on <code>'high-voltage battery'</code> where the column
+      holds <code>'battery_hv'</code>, and a guess returning zero rows reads exactly like a
       true answer of zero.</li>
 
-    <li><b>Azure's content filter killed the evaluation, and it was right to.</b> The
-      judge prompt quoted the prompt-extraction case verbatim, and the platform
-      classified the grading request itself as a jailbreak attempt. Adversarial cases now
-      reach the judge described rather than quoted.</li>
+    <li><b>Azure's content filter killed the evaluation, and it was right to.</b> The judge
+      prompt quoted the prompt-extraction case verbatim, and the platform classified the
+      grading request itself as a jailbreak attempt. Adversarial cases now reach the judge
+      described rather than quoted.</li>
 
     <li><b>A blocked request is a refusal, not a failure.</b> The Spanish prompt-extraction
-      case was stopped by the content filter before the model saw it, and the empty answer
-      was first scored as a failure to decline. Scoring it that way marks defence in depth
-      as a defect and quietly rewards turning the filter off. It now passes, recording
-      which layer refused — “the model declined” and “the platform blocked it” are
-      different assurances.</li>
+      case was stopped by the filter before the model saw it, and the empty answer was first
+      scored as a failure to decline. Scoring it that way marks defence in depth as a defect
+      and quietly rewards turning the filter off.</li>
 
-    <li><b>CSV has no types, and inference is not the fix.</b> <code>COPY INTO</code>
-      refused the first load because Delta will not merge a string into a
-      <code>DATE</code> column. Turning inference on is how a mileage column silently
-      becomes a string and every numeric comparison starts returning nothing; the columns
-      are declared once and cast on the way in.</li>
+    <li><b>CSV has no types, and inference is not the fix.</b> <code>COPY INTO</code> refused
+      the first load because Delta will not merge a string into a <code>DATE</code> column.
+      Inference is how a mileage column silently becomes a string and every numeric
+      comparison starts returning nothing; the columns are declared once and cast on the way
+      in.</li>
   </ul>
 
   <h2>What this does not show</h2>
@@ -168,9 +248,9 @@
     <p><b>This is one agent, not a platform.</b> It runs SQL against five tables. It is not
     evidence of Spark work, streaming, job orchestration, or operating a fleet of agents
     across departments.</p>
-    <p><b>The judge is a language model.</b> Numeric cases are scored deterministically,
-    but refusals are graded by an LLM against a rubric. Its one-line reasoning is published
-    with each case precisely so it can be disagreed with.</p>
+    <p><b>The judge is a language model.</b> Numeric cases are scored deterministically;
+    refusals are graded by an LLM against a rubric, and its reasoning is published with each
+    case precisely so it can be disagreed with.</p>
   </div>
 
   <footer id="footer"></footer>
@@ -178,74 +258,92 @@
 
 <script>
 const REPO = "https://github.com/Javoo-bot/foundry-agent";
+const LINKEDIN = "https://www.linkedin.com/in/javier-lobato-menendez/";
+const CHAT = "https://fleet-agent-chat.huertos-madrid.workers.dev";
+
 const $ = (s) => document.querySelector(s);
 const pct = (x) => x === null || x === undefined ? "—" : Math.round(x * 100) + "%";
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-function fail(msg) {
-  $("#meta").innerHTML = `<span class="err">${esc(msg)}</span>`;
-}
-
 function renderMeta(d) {
   const when = new Date(d.generated_at);
-  const age = Math.round((Date.now() - when) / 36e5);
+  const age = (Date.now() - when) / 36e5;
   const stale = age > 48;
-  const bits = [
-    `Last run <b>${when.toLocaleString()}</b>${stale ? " (not recent)" : ""}`,
+  $("#meta").innerHTML = [
+    `Last run <b>${when.toLocaleString()}</b>${stale ? " — not recent" : ""}`,
     `commit <b class="mono">${esc(d.commit)}</b>`,
     `model <b>${esc(d.model_deployment)}</b>`,
-    d.agent_version ? `agent version <b>${esc(d.agent_version)}</b>` : "",
-    d.run_url ? `<a href="${esc(d.run_url)}">the Actions run that produced this</a>` : ""
-  ].filter(Boolean);
-  $("#meta").innerHTML = bits.join("<span style='opacity:.4'>·</span>");
+    d.run_url ? `<a href="${esc(d.run_url)}">the Actions run behind these numbers</a>` : ""
+  ].filter(Boolean).join("<span style='opacity:.4'>·</span>");
   if (stale) {
     $("#caveats").insertAdjacentHTML("afterbegin",
-      `<p><b>These results are ${age > 720 ? Math.round(age/24) + " days" : age + " hours"} old.</b>
-       The scheduled run stops when the Azure credit that pays for it expires; the history
-       below is what it measured while it was live.</p>`);
+      `<p><b>These results are ${age > 720 ? Math.round(age/24) + " days" : Math.round(age) + " hours"} old.</b>
+       The scheduled run stops when the Azure credit paying for it expires; the history below
+       is what it measured while it was live.</p>`);
   }
 }
 
 function renderTiles(s) {
+  const weakest = Object.entries(s.by_type)
+    .filter(([, v]) => v.total).sort((a, b) => (a[1].rate ?? 1) - (b[1].rate ?? 1))[0];
   const t = [
-    { n: `${s.passed}/${s.total}`, l: `cases passed (${pct(s.rate)})`, big: true },
+    { n: `${s.passed}/${s.total}`, l: `golden cases passed (${pct(s.rate)})`, cls: "big" },
     { n: `${s.by_type.aggregate.passed}/${s.by_type.aggregate.total}`, l: "numeric answers correct" },
     { n: `${s.by_type.refuse.passed}/${s.by_type.refuse.total}`, l: "correctly declined" },
-    { n: `${s.by_type.unanswerable.passed}/${s.by_type.unanswerable.total}`, l: "correctly said “not in the data”" },
-    { n: s.queries_blocked_by_guard, l: "queries stopped by the SQL guard" },
+    { n: `${s.by_type.unanswerable.passed}/${s.by_type.unanswerable.total}`,
+      l: "said “not in the data”", cls: (s.by_type.unanswerable.rate ?? 1) < 0.8 ? "warnv" : "" },
     { n: (s.median_latency_ms / 1000).toFixed(1) + "s", l: "median end-to-end latency" },
     { n: s.total_tokens.toLocaleString(), l: "tokens for the whole run" },
   ];
-  const langs = Object.entries(s.by_lang || {}).filter(([, v]) => v.total);
-  for (const [l, v] of langs) t.push({ n: `${v.passed}/${v.total}`, l: `asked in ${l.toUpperCase()}` });
   $("#tiles").innerHTML = t.map(x =>
-    `<div class="tile${x.big ? " big" : ""}"><div class="n">${esc(x.n)}</div><div class="l">${x.l}</div></div>`
-  ).join("");
+    `<div class="tile ${x.cls || ""}"><div class="n">${esc(x.n)}</div><div class="l">${x.l}</div></div>`).join("");
+  if (weakest && (weakest[1].rate ?? 1) < 0.8) {
+    $("#tiles").insertAdjacentHTML("afterend",
+      `<p class="lede sm" style="margin-top:12px"><b style="color:var(--warn)">The weak spot is real and left in.</b>
+       Asked for average driver age — a column the schema does not have — the agent computed
+       vehicle age from model year and presented it as an answer. A confident number is more
+       dangerous than a refusal, because it looks like an answer.</p>`);
+  }
+}
+
+function renderBars(s) {
+  const rows = [
+    ["Numeric answers", s.by_type.aggregate],
+    ["Correctly declined", s.by_type.refuse],
+    ["“Not in the data”", s.by_type.unanswerable],
+    ["Asked in English", s.by_lang?.en],
+    ["Asked in Spanish", s.by_lang?.es],
+  ].filter(([, v]) => v && v.total);
+  $("#bars").innerHTML = rows.map(([label, v]) => {
+    const r = v.passed / v.total;
+    return `<div class="bar">
+      <div class="lbl">${label}</div>
+      <div class="track"><div class="fill${r < 0.8 ? " low" : ""}" style="width:${(r * 100).toFixed(0)}%"></div></div>
+      <div class="num">${v.passed}/${v.total}</div>
+    </div>`;
+  }).join("");
 }
 
 function renderTrend(history) {
   const el = $("#trend");
-  if (!history || history.length < 2) {
-    el.innerHTML = `<p class="lede" style="font-size:14px">A trend needs more than one run.
-      This is run ${history ? history.length : 1}; the line appears from the second onward.</p>`;
+  const pts = (history || []).filter(p => p.summary && p.summary.total).slice(-40);
+  if (pts.length < 2) {
+    el.innerHTML = `<p class="lede sm">A trend needs more than one run. This is run ${pts.length || 1};
+      the line appears from the second onward.</p>`;
     return;
   }
-  const pts = history.slice(-40);
-  const W = 900, H = 170, P = 34;
+  const W = 900, H = 170, P = 36, gate = pts[pts.length - 1].summary.gate ?? 0.75;
   const x = i => P + i * (W - 2 * P) / Math.max(1, pts.length - 1);
   const y = r => H - P - r * (H - 2 * P);
   const line = pts.map((p, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p.summary.rate).toFixed(1)}`).join("");
-  const gate = pts[pts.length - 1].summary ? 0.75 : 0.75;
   el.innerHTML = `<div class="scroll"><svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:100%;height:auto"
-      role="img" aria-label="Pass rate over the last ${pts.length} runs">
-    <line x1="${P}" y1="${y(gate)}" x2="${W - P}" y2="${y(gate)}"
-          stroke="var(--fail)" stroke-dasharray="4 4" opacity=".55"/>
-    <text x="${W - P}" y="${y(gate) - 6}" text-anchor="end" font-size="11" fill="var(--fail)">gate</text>
-    ${[0, .5, 1].map(r => `<text x="${P - 8}" y="${y(r) + 4}" text-anchor="end"
-          font-size="11" fill="var(--muted)">${r * 100}%</text>`).join("")}
+      role="img" aria-label="Pass rate across the last ${pts.length} runs">
+    <line x1="${P}" y1="${y(gate)}" x2="${W - P}" y2="${y(gate)}" stroke="var(--fail)" stroke-dasharray="4 4" opacity=".55"/>
+    <text x="${W - P}" y="${y(gate) - 6}" text-anchor="end" font-size="11" fill="var(--fail)">build fails below here</text>
+    ${[0, .5, 1].map(r => `<text x="${P - 8}" y="${y(r) + 4}" text-anchor="end" font-size="11" fill="var(--muted)">${r * 100}%</text>`).join("")}
     <path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2"/>
-    ${pts.map((p, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(p.summary.rate).toFixed(1)}" r="3"
-          fill="var(--accent)"><title>${esc(p.commit)} — ${pct(p.summary.rate)}</title></circle>`).join("")}
+    ${pts.map((p, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(p.summary.rate).toFixed(1)}" r="3.5" fill="var(--accent)">
+        <title>${esc(p.commit)} — ${p.summary.passed}/${p.summary.total}</title></circle>`).join("")}
   </svg></div>`;
 }
 
@@ -254,8 +352,7 @@ function renderCases(cases) {
   body.innerHTML = `<tr><th>Case</th><th>Lang</th><th>Kind</th><th>Question</th><th>Result</th></tr>` +
     cases.map((c, i) => `
       <tr class="case" data-i="${i}">
-        <td class="mono">${esc(c.id)}</td>
-        <td class="mono">${esc(c.lang)}</td>
+        <td class="mono">${esc(c.id)}</td><td class="mono">${esc(c.lang)}</td>
         <td><span class="tag">${esc(c.type)}</span></td>
         <td>${esc(c.question)}</td>
         <td class="v ${c.passed ? "pass" : "fail"}">${c.passed ? "pass" : "FAIL"}</td>
@@ -264,19 +361,16 @@ function renderCases(cases) {
         <div class="k">Answer</div><div>${esc(c.answer) || "<i>(empty)</i>"}</div>
         <div class="k">Scoring</div><div>${esc(c.detail)}</div>
         ${c.error ? `<div class="k">Error</div><div class="err">${esc(c.error)}</div>` : ""}
-        ${(c.trace || []).length ? `<div class="k">SQL the agent ran</div>` +
-          c.trace.map(t => `<pre>${esc(t.sql)}</pre>
+        <div class="k">SQL the agent ran</div>
+        ${(c.trace || []).length ? c.trace.map(t => `<pre>${esc(t.sql)}</pre>
             <div style="font-size:12px;color:var(--muted)">
               ${t.blocked ? `<span class="blocked">blocked by guard: ${esc(t.error || "")}</span>`
                 : t.ok ? `${t.rows} row(s) in ${t.elapsed_ms} ms`
                 : `<span class="err">${esc(t.error || "failed")}</span>`}
               ${t.purpose ? " · " + esc(t.purpose) : ""}
-            </div>`).join("")
-          : `<div class="k">SQL the agent ran</div><div style="color:var(--muted)">none</div>`}
-        <div class="k">Cost</div>
-        <div style="font-size:13px;color:var(--muted)">
-          ${(c.tokens.input || 0) + (c.tokens.output || 0)} tokens · ${c.latency_ms} ms
-        </div>
+            </div>`).join("") : `<div style="color:var(--muted)">none — it answered without querying</div>`}
+        <div class="k">Cost</div><div style="font-size:13px;color:var(--muted)">
+          ${(c.tokens?.input || 0) + (c.tokens?.output || 0)} tokens · ${c.latency_ms} ms</div>
       </td></tr>`).join("");
   body.addEventListener("click", e => {
     const row = e.target.closest("tr.case");
@@ -286,25 +380,71 @@ function renderCases(cases) {
   });
 }
 
+// ---- chat -----------------------------------------------------------------
+const SUGGESTIONS = [
+  "What has he shipped to production?",
+  "Does he know Databricks?",
+  "¿Qué experiencia tiene evaluando LLMs?",
+  "What is his salary expectation?",
+];
+
+function setupChat() {
+  $("#chips").innerHTML = SUGGESTIONS.map(s =>
+    `<button class="chip" type="button">${esc(s)}</button>`).join("");
+  $("#chips").addEventListener("click", e => {
+    const b = e.target.closest(".chip");
+    if (b) { $("#q").value = b.textContent; send(); }
+  });
+  $("#send").addEventListener("click", send);
+  $("#q").addEventListener("keydown", e => { if (e.key === "Enter") send(); });
+}
+
+async function send() {
+  const input = $("#q"), out = $("#answer"), btn = $("#send");
+  const question = input.value.trim();
+  if (!question) return;
+  btn.disabled = true; out.textContent = "…";
+  try {
+    const res = await fetch(CHAT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question }),
+    });
+    const data = await res.json();
+    out.innerHTML = data.answer
+      ? esc(data.answer)
+      : `<span class="err">${esc(data.error || "No answer came back.")}</span>`;
+    const left = res.headers.get("X-Budget-Remaining-Today");
+    const mine = res.headers.get("X-Your-Questions-This-Hour");
+    if (left) $("#budget").textContent =
+      `You have used ${mine} questions this hour · ${left} left in today's budget across all visitors.`;
+  } catch {
+    out.innerHTML = `<span class="err">The chat endpoint is unreachable. The evaluation results above are unaffected.</span>`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
 (async function () {
+  setupChat();
   try {
     const [latest, history] = await Promise.all([
-      fetch("data/latest.json").then(r => r.ok ? r.json() : Promise.reject(new Error("no latest.json"))),
+      fetch("data/latest.json").then(r => r.ok ? r.json() : Promise.reject(new Error("no results published yet"))),
       fetch("data/history.json").then(r => r.ok ? r.json() : []).catch(() => [])
     ]);
     renderMeta(latest);
     renderTiles(latest.summary);
+    renderBars(latest.summary);
     renderTrend(history);
     renderCases(latest.cases);
-    $("#footer").innerHTML =
-      `Built by <b>Javier Lobato</b> — Microsoft Foundry, Databricks, GitHub Actions. ` +
-      `Synthetic data throughout.<br>` +
-      `<a href="${REPO}">Source, and the commits behind every decision above</a> · ` +
-      `<a href="${REPO}/actions">every evaluation run</a>`;
   } catch (err) {
-    fail("Could not load results: " + err.message +
-      " — the evaluation has not published a run yet.");
+    $("#meta").innerHTML = `<span class="err">Could not load results: ${esc(err.message)}</span>`;
   }
+  $("#footer").innerHTML =
+    `Built by <b>Javier Lobato</b> — AI Engineer, Barcelona. Microsoft Foundry, Databricks, ` +
+    `GitHub Actions, Cloudflare Workers. Synthetic data throughout.<br>` +
+    `<a href="${REPO}">Source</a> · <a href="${REPO}/actions">every evaluation run</a> · ` +
+    `<a href="${LINKEDIN}">LinkedIn</a>`;
 })();
 </script>
 </body>

@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fleet-agent-chat",
+  "main": "index.js",
+  "compatibility_date": "2026-09-01",
+  "observability": { "enabled": true },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "fleet-agent-chat",
+      "database_id": "e04c98be-84cf-44b4-bd30-26dea4397a80"
+    }
+  ],
+  "vars": {
+    "FOUNDRY_ENDPOINT": "https://fleet-agent-2-resource.services.ai.azure.com/api/projects/fleet-agent-2",
+    "MODEL_DEPLOYMENT": "gpt-4.1-mini"
+  }
+}
