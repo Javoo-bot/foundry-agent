@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 250" width="900" height="250"
+     role="img" aria-label="GitHub Actions drives a Microsoft Foundry agent, which queries Databricks through a read-only SQL guard; the results are published back to GitHub Pages.">
+  <title>How it is wired</title>
+  <desc>Nightly, GitHub Actions runs the golden set against a Microsoft Foundry agent. The agent writes SQL, a read-only guard checks it, Databricks executes it, and the scored results are committed and published to GitHub Pages.</desc>
+
+  <!--
+    Colours are picked to carry on both a white and a dark README. GitHub
+    proxies this file as an image, so there is no host stylesheet to inherit
+    and no prefers-color-scheme to rely on: every value has to work on both.
+  -->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8b8b85"/>
+    </marker>
+    <style>
+      .box  { fill: none; stroke-width: 1.6; }
+      .name { font: 600 14px ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif; }
+      .sub  { font: 11.5px ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif; fill: #8b8b85; }
+      .wire { fill: none; stroke: #8b8b85; stroke-width: 1.5; }
+      .dot  { fill: #3f9c85; }
+    </style>
+  </defs>
+
+  <!-- GitHub Actions -->
+  <rect class="box" x="8"  y="92" width="146" height="62" rx="8" stroke="#8b8b85"/>
+  <text class="name" x="81"  y="118" text-anchor="middle" fill="#8b8b85">GitHub Actions</text>
+  <text class="sub"  x="81"  y="136" text-anchor="middle">nightly + on push</text>
+
+  <!-- Foundry -->
+  <rect class="box" x="206" y="80" width="176" height="86" rx="8" stroke="#3f8fd2"/>
+  <text class="name" x="294" y="104" text-anchor="middle" fill="#3f8fd2">Microsoft Foundry</text>
+  <text class="sub"  x="294" y="122" text-anchor="middle">gpt-4.1-mini · Responses API</text>
+  <text class="sub"  x="294" y="139" text-anchor="middle">plans, then writes SQL</text>
+  <text class="sub"  x="294" y="156" text-anchor="middle">tool: query_fleet_data</text>
+
+  <!-- guard -->
+  <rect class="box" x="434" y="92" width="132" height="62" rx="8" stroke="#b38b2a"/>
+  <text class="name" x="500" y="118" text-anchor="middle" fill="#b38b2a">SQL guard</text>
+  <text class="sub"  x="500" y="136" text-anchor="middle">read-only · 18 tests</text>
+
+  <!-- Databricks -->
+  <rect class="box" x="618" y="80" width="176" height="86" rx="8" stroke="#d2694f"/>
+  <text class="name" x="706" y="104" text-anchor="middle" fill="#d2694f">Databricks</text>
+  <text class="sub"  x="706" y="122" text-anchor="middle">serverless SQL warehouse</text>
+  <text class="sub"  x="706" y="139" text-anchor="middle">Unity Catalog · gishub.fleet</text>
+  <text class="sub"  x="706" y="156" text-anchor="middle">183,000 rows · 5 tables</text>
+
+  <!-- GitHub Pages -->
+  <rect class="box" x="330" y="196" width="240" height="46" rx="8" stroke="#8b8b85"/>
+  <text class="name" x="450" y="216" text-anchor="middle" fill="#8b8b85">GitHub Pages</text>
+  <text class="sub"  x="450" y="233" text-anchor="middle">scored results, committed to the repo</text>
+
+  <!-- wires -->
+  <path id="w1" class="wire" d="M154,123 L200,123" marker-end="url(#a)"/>
+  <path id="w2" class="wire" d="M382,123 L428,123" marker-end="url(#a)"/>
+  <path id="w3" class="wire" d="M566,123 L612,123" marker-end="url(#a)"/>
+  <path id="w4" class="wire" d="M794,123 L840,123 L840,219 L576,219" marker-end="url(#a)" stroke-dasharray="5 4"/>
+  <path id="w5" class="wire" d="M81,154 L81,219 L324,219" marker-end="url(#a)" stroke-dasharray="5 4"/>
+
+  <!--
+    One packet per hop. The staggered begins trace a single request moving
+    left to right and the answer coming back, rather than five unrelated
+    blinking dots.
+  -->
+  <circle class="dot" r="4.5" opacity="0">
+    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.08;0.92;1" dur="1s" begin="0s;flow.end+1.2s" fill="freeze"/>
+    <animateMotion dur="1s" begin="0s;flow.end+1.2s" fill="freeze"><mpath href="#w1"/></animateMotion>
+  </circle>
+  <circle class="dot" r="4.5" opacity="0">
+    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.08;0.92;1" dur="0.8s" begin="1.3s;flow.end+2.5s" fill="freeze"/>
+    <animateMotion dur="0.8s" begin="1.3s;flow.end+2.5s" fill="freeze"><mpath href="#w2"/></animateMotion>
+  </circle>
+  <circle class="dot" r="4.5" opacity="0">
+    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.08;0.92;1" dur="0.8s" begin="2.1s;flow.end+3.3s" fill="freeze"/>
+    <animateMotion dur="0.8s" begin="2.1s;flow.end+3.3s" fill="freeze"><mpath href="#w3"/></animateMotion>
+  </circle>
+  <circle class="dot" r="4.5" opacity="0">
+    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="1.6s" begin="2.9s;flow.end+4.1s" fill="freeze"/>
+    <animateMotion id="flow" dur="1.6s" begin="2.9s;flow.end+4.1s" fill="freeze"><mpath href="#w4"/></animateMotion>
+  </circle>
+</svg>

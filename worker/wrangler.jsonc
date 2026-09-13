@@ -2,6 +2,9 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "fleet-agent-chat",
   "main": "index.js",
+  // the profile is a text file so the evaluation suite and the Worker
+  // read the same bytes; two copies would drift and only one gets tested
+  "rules": [{ "type": "Text", "globs": ["**/*.txt"] }],
   "compatibility_date": "2026-09-01",
   "observability": { "enabled": true },
   "d1_databases": [

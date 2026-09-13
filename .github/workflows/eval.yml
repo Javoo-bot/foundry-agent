@@ -53,8 +53,20 @@ jobs:
           DATABRICKS_WAREHOUSE_ID: ${{ secrets.DATABRICKS_WAREHOUSE_ID }}
         run: python evals/run.py
 
-      # Publish the results even when the gate failed. A run that dropped
-      # below the threshold is exactly the run worth being able to read.
+      # The chat on the page is a model answering from a source, same as the
+      # agent, so it is measured the same way. Leaving it unevaluated would
+      # make it the one unexamined claim on a page whose whole argument is
+      # that claims should be measured.
+      - name: Run the chat golden set
+        if: always()
+        env:
+          AZURE_AI_PROJECT_ENDPOINT: ${{ secrets.AZURE_AI_PROJECT_ENDPOINT }}
+          AZURE_AI_MODEL_DEPLOYMENT_NAME: ${{ secrets.AZURE_AI_MODEL_DEPLOYMENT_NAME }}
+          AZURE_MODEL_TOKEN: ${{ secrets.AZURE_MODEL_TOKEN }}
+        run: python evals/run_chat.py
+
+      # Publish the results even when a gate failed. A run that dropped below
+      # the threshold is exactly the run worth being able to read.
       - name: Commit the results
         if: always()
         run: |
