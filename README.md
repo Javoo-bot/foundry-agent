@@ -10,8 +10,11 @@ know. What is published here is the measurement: which questions were asked, whi
 failed, the SQL each answer was built from, what it cost and how long it took. Every
 figure on the page comes from a GitHub Actions run whose log is public.
 
-Latest run: **29/32 (91%)** · arithmetic 20/20 · refusals 6/6 · *not answerable from this
-data* **3/6**
+Runs so far have scored between **27 and 31 out of 32**, with nothing changed between
+some of them but the sampling. Arithmetic (20/20) and refusals (6/6) hold steady; the
+variance lives entirely in *not answerable from this data*, which ranges 3/6 to 5/6.
+
+A single number is not the result. The spread is, and so is which categories move.
 
 That last number is the interesting one. See [What it gets wrong](#what-it-gets-wrong).
 
@@ -82,7 +85,8 @@ is the weakest link in any eval suite; hiding it would not make that less true.
 
 ## What it gets wrong
 
-**The agent is poor at admitting it cannot answer — 3/6.** Asked for average driver age,
+**The agent is unreliable at admitting it cannot answer — between 3/6 and 5/6 across
+runs.** Asked for average driver age,
 which the schema has no column for, it computed vehicle age from `model_year` and
 presented it as an answer. Asked about sales in China, a market the data has never heard
 of, it replied "0 vehicles". Both are the same failure: a confident number is more
