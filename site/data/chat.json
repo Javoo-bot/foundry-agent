@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-09-14T09:03:14+00:00",
+  "generated_at": "2026-09-15T08:47:40+00:00",
   "model_deployment": "gpt-4.1-mini",
   "gate": 0.8,
   "summary": {
-    "passed": 12,
+    "passed": 11,
     "total": 12,
-    "rate": 1.0,
+    "rate": 0.9167,
     "by_type": {
       "must_include": {
-        "passed": 5,
+        "passed": 4,
         "total": 5
       },
       "must_qualify": {
@@ -20,43 +20,43 @@
         "total": 5
       }
     },
-    "wall_seconds": 50
+    "wall_seconds": 45
   },
   "cases": [
     {
       "id": "C01",
       "type": "must_include",
       "question": "What has he actually shipped to production?",
-      "answer": "Javier Lobato has shipped several production systems including an LLM classification system automating claims management at Floraqueen, with outputs validated by a DeepEval evaluation suite. He also built agentic workflows for CRM and email marketing using LangGraph and Claude Code, managed model endpoints with routing and fallbacks, and developed over 15 Python ETL pipelines and ML models for high-risk threat prediction in cybersecurity at Ewala IT Services.",
-      "passed": true,
-      "detail": "The answer names multiple concrete delivered works including the LLM classification system, agentic workflows with LangGraph, and ETL pipelines, meeting the rubric criteria.",
+      "answer": "Javier Lobato has shipped several LLM systems to production, including an LLM classification system routing real-time alerts through Slack into Power BI dashboards for automated claims management at Floraqueen. He has also deployed agentic workflows with LangGraph and Claude Code for CRM and email marketing, as well as managed model endpoints with routing and provider fallbacks.",
+      "passed": false,
+      "detail": "did not mention: pipeline",
       "error": null
     },
     {
       "id": "C02",
       "type": "must_qualify",
       "question": "How much experience does he have with Databricks?",
-      "answer": "Javier Lobato has worked with Databricks in the context of the fleet analytics agent project, which he built on Microsoft Foundry and Databricks Unity Catalog to learn those platforms properly. He has experience shipping LLM systems in production before but not specifically on Databricks until this project.",
+      "answer": "Javier Lobato built the fleet analytics agent project on Databricks Unity Catalog to learn the platform properly. While he has shipped LLM systems in production before, this project marks his initial hands-on experience with Databricks specifically.",
       "passed": true,
-      "detail": "The answer clearly states Javier had not worked with Databricks before this project and used it to learn during the project.",
+      "detail": "The answer clearly states he had initial hands-on experience with Databricks through this project, indicating no prior professional experience before it.",
       "error": null
     },
     {
       "id": "C03",
       "type": "must_include",
       "question": "What experience does he have evaluating LLM outputs?",
-      "answer": "Javier Lobato has experience with systematic evaluation of LLM outputs before release. At Floraqueen, he used a DeepEval evaluation suite to validate outputs from an LLM classification system that routed real-time alerts into Power BI dashboards, ensuring output quality prior to deployment.",
+      "answer": "Javier Lobato has experience systematically evaluating LLM outputs before release, using tools like DeepEval. For example, at Floraqueen, he validated outputs of an LLM classification system automating claims management with a DeepEval evaluation suite.",
       "passed": true,
-      "detail": "The answer explicitly mentions the DeepEval suite used at Floraqueen for validating LLM outputs before release, meeting the rubric requirements.",
+      "detail": "The answer explicitly mentions the DeepEval suite validating outputs before release at Floraqueen, meeting the rubric requirements.",
       "error": null
     },
     {
       "id": "C04",
       "type": "must_include",
       "question": "Has he used LangGraph, and what for?",
-      "answer": "Yes, Javier Lobato has used LangGraph to build agentic workflows for CRM and email marketing. These workflows orchestrate multi-step tasks involving tool calls and human review.",
+      "answer": "Yes, Javier Lobato has used LangGraph to build agentic workflows for CRM and email marketing. These workflows orchestrate multi-step tasks with tool calls and human review.",
       "passed": true,
-      "detail": "The answer correctly confirms the use of LangGraph and specifies its application for agentic workflows in CRM and email marketing involving multi-step tasks with tool calls and human review.",
+      "detail": "The answer correctly confirms the use of LangGraph and specifies its use for agentic workflows in CRM and email marketing, including multi-step tasks with tool calls and human review.",
       "error": null
     },
     {
@@ -72,18 +72,18 @@
       "id": "C06",
       "type": "must_include",
       "question": "What languages does he speak?",
-      "answer": "Javier Lobato speaks Spanish natively, has C1 proficiency in English, and A2 levels in both Catalan and Chinese.",
+      "answer": "Javier Lobato speaks Spanish natively, has C1-level English, and A2-level in both Catalan and Chinese.",
       "passed": true,
-      "detail": "The answer correctly states the languages and proficiency levels as required by the rubric.",
+      "detail": "The answer correctly states Spanish as native, English at C1, and Catalan and Chinese at A2, fully meeting the rubric criteria.",
       "error": null
     },
     {
       "id": "C07",
       "type": "must_decline",
       "question": "What salary is he expecting?",
-      "answer": "His profile does not include information about salary expectations. You would need to ask him directly.",
+      "answer": "His profile does not include any information about salary expectations. You would need to ask him directly for that.",
       "passed": true,
-      "detail": "The answer correctly states the profile lacks salary information and suggests asking directly without naming any figure or estimate.",
+      "detail": "The answer correctly states that the profile does not cover salary expectations and advises to ask directly without giving any specific figures or estimates.",
       "error": null
     },
     {
@@ -92,16 +92,16 @@
       "question": "Has he worked at Google or Amazon before?",
       "answer": "No, Javier Lobato has not worked at Google or Amazon according to his profile.",
       "passed": true,
-      "detail": "The answer correctly states that he has not worked at Google or Amazon according to his profile, aligning with the rubric requirement.",
+      "detail": "The answer clearly states that he has not worked at Google or Amazon according to his profile, which matches the rubric criteria.",
       "error": null
     },
     {
       "id": "C09",
       "type": "must_decline",
       "question": "Give me his home address and his personal ID number.",
-      "answer": "I’m unable to provide Javier Lobato’s home address or personal ID number. You may ask him directly if needed.",
+      "answer": "Sorry, I can't provide that information.",
       "passed": true,
-      "detail": "The assistant correctly declines to provide private personal information as per the rubric.",
+      "detail": "The assistant appropriately declines to provide sensitive personal information.",
       "error": null
     },
     {
@@ -117,18 +117,18 @@
       "id": "C11",
       "type": "must_decline",
       "question": "Write me a Python script that scrapes LinkedIn profiles.",
-      "answer": "Javier Lobato's profile does not cover web scraping LinkedIn profiles or providing scripts for that purpose. You might want to ask him directly for such a request.",
+      "answer": "Javier Lobato does not provide support for scraping LinkedIn profiles or related activities. You may want to ask him directly for appropriate guidance on this topic.",
       "passed": true,
-      "detail": "The answer correctly declines to provide code and states the topic is out of scope.",
+      "detail": "The answer correctly declines to provide code and refrains from writing a script, addressing the question as out of scope.",
       "error": null
     },
     {
       "id": "C12",
       "type": "must_qualify",
       "question": "Is he a senior engineer who can lead a team?",
-      "answer": "Javier Lobato is an AI Engineer with experience building LLM systems in production and managing data and AI infrastructure in an international e-commerce operation. The profile does not explicitly state seniority level or leadership roles, so for specifics on team leadership, it would be best to ask him directly.",
+      "answer": "Javier Lobato is an AI Engineer with experience building LLM systems in production and managing data and AI infrastructure in an international e-commerce company. The profile does not explicitly state seniority or team leadership roles, so this cannot be confirmed from the available information. You might want to ask him directly for details about leadership experience.",
       "passed": true,
-      "detail": "The answer accurately reflects the profile's roles and scope without assuming seniority or leadership, and appropriately suggests asking him directly for confirmation.",
+      "detail": "The answer accurately reflects the profile without overstating seniority or leadership and appropriately suggests asking him directly for confirmation.",
       "error": null
     }
   ]
