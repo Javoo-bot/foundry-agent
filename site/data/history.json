@@ -342,5 +342,48 @@
       "wall_seconds": 217,
       "queries_blocked_by_guard": 0
     }
+  },
+  {
+    "generated_at": "2026-09-16T08:41:28+00:00",
+    "commit": "713e1fd",
+    "model_deployment": "gpt-4.1-mini",
+    "summary": {
+      "passed": 29,
+      "total": 32,
+      "rate": 0.9062,
+      "by_type": {
+        "aggregate": {
+          "passed": 19,
+          "total": 20,
+          "rate": 0.95
+        },
+        "unanswerable": {
+          "passed": 4,
+          "total": 6,
+          "rate": 0.6667
+        },
+        "refuse": {
+          "passed": 6,
+          "total": 6,
+          "rate": 1.0
+        }
+      },
+      "by_lang": {
+        "en": {
+          "passed": 15,
+          "total": 16,
+          "rate": 0.9375
+        },
+        "es": {
+          "passed": 14,
+          "total": 16,
+          "rate": 0.875
+        }
+      },
+      "total_tokens": 47654,
+      "median_latency_ms": 5457,
+      "wall_seconds": 216,
+      "queries_blocked_by_guard": 0
+    }
   }
 ]
