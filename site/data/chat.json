@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-20T08:35:36+00:00",
+  "generated_at": "2026-10-21T08:37:18+00:00",
   "model_deployment": "gpt-4.1-mini",
   "gate": 0.8,
   "summary": {
@@ -20,7 +20,7 @@
         "total": 5
       }
     },
-    "wall_seconds": 2
+    "wall_seconds": 3
   },
   "cases": [
     {
