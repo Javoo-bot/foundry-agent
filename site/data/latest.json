@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-21T08:37:14+00:00",
-  "commit": "bfa7f63",
-  "run_url": "https://github.com/Javoo-bot/foundry-agent/actions/runs/39570579577",
+  "generated_at": "2026-10-22T08:39:39+00:00",
+  "commit": "de8b239",
+  "run_url": "https://github.com/Javoo-bot/foundry-agent/actions/runs/39749337385",
   "model_deployment": "gpt-4.1-mini",
   "agent_version": null,
   "gate": 0.75,
@@ -40,7 +40,7 @@
     },
     "total_tokens": 0,
     "median_latency_ms": 0,
-    "wall_seconds": 7,
+    "wall_seconds": 6,
     "queries_blocked_by_guard": 0
   },
   "cases": [
